@@ -12,6 +12,7 @@ import { Text } from '../src/components/Text/Text';
 import { createFlightAction } from '../store/actions/admin.action';
 import { AppState, Flight as FlightType } from '../store/types';
 import { Column, Section, Wrapper } from '../styles/admin';
+import { airlines, destinations } from '../src/data';
 
 const Admin: NextPage = () => {
   const dispatch: any = useDispatch();
@@ -44,60 +45,6 @@ const Admin: NextPage = () => {
       moment(new Date().toISOString()).format('yyyy-MM-DDThh:mm')
     );
   };
-
-  const airlines = [
-    {
-      value: 'qatar',
-      label: 'Qatar Airways',
-    },
-    {
-      value: 'singapore',
-      label: 'Singapore Airlines',
-    },
-    {
-      value: 'emirates',
-      label: 'Emirates',
-    },
-    {
-      value: 'france',
-      label: 'Air France',
-    },
-    {
-      value: 'lufthansa',
-      label: 'Lufthansa',
-    },
-  ];
-
-  const destinations = [
-    {
-      value: 'paris',
-      label: 'Paris',
-    },
-    {
-      value: 'bangkok',
-      label: 'Bangkok',
-    },
-    {
-      value: 'london',
-      label: 'London',
-    },
-    {
-      value: 'dubai',
-      label: 'Dubai',
-    },
-    {
-      value: 'istanbul',
-      label: 'Istanbul',
-    },
-    {
-      value: 'podgorica',
-      label: 'Podgorica',
-    },
-    {
-      value: 'tokyo',
-      label: 'Tokyo',
-    },
-  ];
 
   const [airline, setAirline] = React.useState<string>('');
   const [destination, setDestination] = React.useState<string>('');

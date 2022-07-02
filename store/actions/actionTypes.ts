@@ -1,1 +1,3 @@
 export const CREATE_FLIGHT = 'CREATE_FLIGHT';
+export const CREATE_PROFILE = 'CREATE_PROFILE';
+export const BOOK_FLIGHT = 'BOOK_FLIGHT';
