@@ -15,7 +15,7 @@ const initialState = {
       destination: 'paris',
       price: 1500,
       seats: 2,
-      id: v4(),
+      id: 1,
     },
   ],
 };
