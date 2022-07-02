@@ -1,11 +1,11 @@
 import type { NextPage } from 'next';
 import Link from 'next/link';
-import Button from '../src/components/Button/Button';
-import { Container } from '../styles/homepage';
+import { Button } from '../src/components/Button/Button';
+import { Wrapper } from '../styles/homepage';
 
 const Home: NextPage = () => {
   return (
-    <Container>
+    <Wrapper>
       <div>
         <Button>
           <Link href="/admin">
@@ -23,7 +23,7 @@ const Home: NextPage = () => {
           </Link>
         </Button>
       </div>
-    </Container>
+    </Wrapper>
   );
 };
 
