@@ -13,7 +13,7 @@ const Home: NextPage = () => {
           </Link>
         </Button>
         <Button>
-          <Link href="/admin">
+          <Link href="/worker">
             <a> CONTINUE AS WORKER</a>
           </Link>
         </Button>
