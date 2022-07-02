@@ -1,6 +1,7 @@
 export type AppState = {
   adminReducer: Flights;
   customerReducer: Customer;
+  customerFlightReducer: CustomerFlight;
 };
 
 export type Flight = {
@@ -27,4 +28,13 @@ export type CustomerType = {
 
 export type Customer = {
   customer: CustomerType;
+};
+
+export type CustomerFlightType = {
+  customerId: string;
+  flightId: string;
+};
+
+export type CustomerFlight = {
+  customerFlight: CustomerFlightType[];
 };
