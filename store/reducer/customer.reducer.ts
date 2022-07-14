@@ -1,7 +1,7 @@
-import { CREATE_PROFILE } from '../actions/actionTypes';
+import { CREATE_PROFILE, REMOVE_USER } from '../actions/actionTypes';
 
 const initialState = {
-  // customer: {},
+  customer: {},
 };
 
 export const customerReducer = (state = initialState, action: any) => {
@@ -11,6 +11,12 @@ export const customerReducer = (state = initialState, action: any) => {
         ...state,
         customer: { ...action.payload },
       };
+    case REMOVE_USER:
+      return {
+        ...state,
+        customer: undefined,
+      };
+
     default:
       return state;
   }

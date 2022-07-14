@@ -68,11 +68,12 @@ export type Destination = {
 };
 
 export type CustomerType = {
-  firstName: string;
-  lastName: string;
+  id: number;
+  ime: string;
+  prezime: string;
   email: string;
-  seats: number | undefined;
-  id: string;
+  jmbg: string;
+  letovi: FlightResponse[];
 };
 
 export type Customer = {

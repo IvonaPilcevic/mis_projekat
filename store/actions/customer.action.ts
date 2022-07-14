@@ -1,35 +1,32 @@
-import { makeReservation } from './../../src/services/customer.service';
+import {
+  createUser,
+  makeReservation,
+} from './../../src/services/customer.service';
 import { Dispatch } from 'redux';
-import { AppState, CustomerType } from '../types';
-import { v4 } from 'uuid';
-import { CREATE_PROFILE } from './actionTypes';
+import { AppState } from '../types';
+import { CREATE_PROFILE, REMOVE_USER } from './actionTypes';
 
 export const createProfileAction = (
   firstName: string,
   lastName: string,
   email: string,
-  seats: number | undefined
+  jmbg: string
 ) => {
   return async (dispatch: Dispatch, getState: () => AppState) => {
     try {
-      const customer: CustomerType = {
-        firstName,
-        lastName,
-        email,
-        seats,
-        id: v4(),
-      };
-      dispatch({ type: CREATE_PROFILE, payload: customer });
+      const data = await createUser(firstName, lastName, email, jmbg);
+      dispatch({ type: CREATE_PROFILE, payload: data });
     } catch (error) {
       console.log('Error while creating customer profile: ', error);
     }
   };
 };
 
-export const makeReservationAction = (flightId: number) => {
-  return async () => {
+export const makeReservationAction = (flightId: number, customerId: number) => {
+  return async (dispatch: Dispatch) => {
     try {
-      await makeReservation(flightId);
+      await makeReservation(customerId, flightId);
+      dispatch({ type: REMOVE_USER });
     } catch (error) {
       console.log('Error while making reservation: ', error);
     }

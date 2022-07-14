@@ -1,12 +1,14 @@
 import { MenuItem, TextField } from '@mui/material';
 import { NextPage } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, SmallButton } from '../src/components/Button/Button';
 import Flight from '../src/components/Flight/Flight';
 import { Span } from '../src/components/Flight/FlightStyle';
 import { Text } from '../src/components/Text/Text';
+import { REMOVE_USER } from '../store/actions/actionTypes';
 import {
   getAirlinesAction,
   getFlightsAction,
@@ -20,6 +22,7 @@ import { AppState } from '../store/types';
 import { Column, Section, Wrapper } from '../styles/admin';
 
 const Customer: NextPage = () => {
+  const router = useRouter();
   const dispatch: any = useDispatch();
   const customer = useSelector(
     (state: AppState) => state?.customerReducer?.customer
@@ -31,6 +34,8 @@ const Customer: NextPage = () => {
   const flights = useSelector(
     (state: AppState) => state?.adminReducer?.flights
   );
+
+  console.log(customer?.id);
 
   const [airline, setAirline] = React.useState<number>();
   const handleChangeAirline = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +57,7 @@ const Customer: NextPage = () => {
   const [lastName, setLastName] = React.useState<string>('');
   const [email, setEmail] = React.useState<string>('');
   const [seats, setSeats] = React.useState<number>();
-  const [JMBG, setJMBG] = React.useState<number | string>();
+  const [JMBG, setJMBG] = React.useState<string>('');
   const [showSuccessMessage, setShowSuccessMessage] =
     React.useState<boolean>(false);
 
@@ -75,38 +80,41 @@ const Customer: NextPage = () => {
   };
 
   const onCreateProfile = () => {
-    dispatch(createProfileAction(firstName, lastName, email, seats));
+    dispatch(createProfileAction(firstName, lastName, email, JMBG));
   };
 
+  React.useEffect(() => {
+    if (showSuccessMessage) {
+      dispatch({ type: REMOVE_USER });
+    }
+  }, [showSuccessMessage]);
+
   const bookFlight = (flightId: number) => {
-    dispatch(makeReservationAction(flightId));
+    dispatch(makeReservationAction(flightId, customer?.id));
     setShowSuccessMessage(true);
   };
 
   return (
     <Wrapper>
       <Column>
-        {typeof customer === 'undefined' ? (
+        {customer?.id ? (
           <Text.h2>Make a reservation</Text.h2>
         ) : (
           <Text.h2>Profile details</Text.h2>
         )}
-        {customer ? (
+        {customer?.id ? (
           <div>
             <Text.bold>
-              Customer ID [JMBG]: <Span>{JMBG}</Span>
+              Customer ID [JMBG]: <Span>{customer?.jmbg}</Span>
             </Text.bold>
             <Text.bold>
-              First name: <Span>{customer?.firstName}</Span>
+              First name: <Span>{customer?.ime}</Span>
             </Text.bold>
             <Text.bold>
-              Last name: <Span>{customer?.lastName}</Span>
+              Last name: <Span>{customer?.prezime}</Span>
             </Text.bold>
             <Text.bold>
               Email: <Span>{customer?.email}</Span>
-            </Text.bold>
-            <Text.bold>
-              Seats: <Span>{customer?.seats}</Span>
             </Text.bold>
           </div>
         ) : (
@@ -230,6 +238,7 @@ const Customer: NextPage = () => {
             <Button onClick={onCreateProfile}>Save</Button>
           </div>
         )}
+        <Button onClick={() => router.push('/')}>Back to homepage</Button>
       </Column>
       <Column>
         <div style={{ maxWidth: '90%' }}>

@@ -38,7 +38,7 @@ const Worker: NextPage = () => {
                 <Text.bold key={passenger?.id + flight?.id}>
                   Passenger with jmbg:{' '}
                   <Span>
-                    {passenger?.prezime} ({passenger?.ime} {passenger?.email})
+                    {passenger?.jmbg} ({passenger?.ime} {passenger?.prezime})
                   </Span>{' '}
                   booked a flight with id: <Span>{flight?.id}</Span>
                 </Text.bold>

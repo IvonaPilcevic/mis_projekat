@@ -1,8 +1,8 @@
 export const CREATE_FLIGHT = 'CREATE_FLIGHT';
 export const CREATE_PROFILE = 'CREATE_PROFILE';
+export const REMOVE_USER = 'REMOVE_USER';
 export const BOOK_FLIGHT = 'BOOK_FLIGHT';
 export const GET_AIRLINES = 'GET_AIRLINES';
 export const GET_DESTINATIONS = 'GET_DESTINATIONS';
 export const GET_FLIGHTS = 'GET_FLIGHTS';
-
 export const GET_PASSENGERS = 'GET_PASSENGERS';
