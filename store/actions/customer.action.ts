@@ -1,3 +1,4 @@
+import { makeReservation } from './../../src/services/customer.service';
 import { Dispatch } from 'redux';
 import { AppState, CustomerType } from '../types';
 import { v4 } from 'uuid';
@@ -21,6 +22,16 @@ export const createProfileAction = (
       dispatch({ type: CREATE_PROFILE, payload: customer });
     } catch (error) {
       console.log('Error while creating customer profile: ', error);
+    }
+  };
+};
+
+export const makeReservationAction = (flightId: number) => {
+  return async () => {
+    try {
+      await makeReservation(flightId);
+    } catch (error) {
+      console.log('Error while making reservation: ', error);
     }
   };
 };

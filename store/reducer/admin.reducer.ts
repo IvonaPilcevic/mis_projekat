@@ -1,35 +1,31 @@
-import { CREATE_FLIGHT } from '../actions/actionTypes';
-import { v4 } from 'uuid';
-import moment from 'moment';
+import {
+  GET_AIRLINES,
+  GET_DESTINATIONS,
+  GET_FLIGHTS,
+} from '../actions/actionTypes';
 
 const initialState = {
-  flights: [
-    {
-      airline: 'lufthansa',
-      timeOfDeparture: moment(new Date().toISOString()).format(
-        'yyyy-MM-DDThh:mm'
-      ),
-      timeOfArrival: moment(new Date().toISOString()).format(
-        'yyyy-MM-DDThh:mm'
-      ),
-      destination: 'paris',
-      price: 1500,
-      seats: 2,
-      id: 1,
-    },
-  ],
+  flights: [],
+  airlines: [],
+  destinations: [],
 };
 
 export const adminReducer = (state = initialState, action: any) => {
   switch (action.type) {
-    case CREATE_FLIGHT:
+    case GET_AIRLINES:
       return {
         ...state,
-        flights: [...state.flights, action.payload],
-        /**
-         * TODO:
-         * flights: [...action.payload] if all flights are returned from api
-         */
+        airlines: [...action.payload],
+      };
+    case GET_DESTINATIONS:
+      return {
+        ...state,
+        destinations: [...action.payload],
+      };
+    case GET_FLIGHTS:
+      return {
+        ...state,
+        flights: [...action.payload],
       };
     default:
       return state;

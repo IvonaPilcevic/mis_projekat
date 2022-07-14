@@ -9,33 +9,61 @@ import { MenuItem, TextField } from '@mui/material';
 import { Button } from '../src/components/Button/Button';
 import Flight from '../src/components/Flight/Flight';
 import { Text } from '../src/components/Text/Text';
-import { createFlightAction } from '../store/actions/admin.action';
-import { AppState, Flight as FlightType } from '../store/types';
+import {
+  createFlightAction,
+  deleteFlightAction,
+  getAirlinesAction,
+  getDestinationsAction,
+  getFlightsAction,
+} from '../store/actions/admin.action';
+import { AppState, FlightResponse } from '../store/types';
 import { Column, Section, Wrapper } from '../styles/admin';
-import { airlines, destinations } from '../src/data';
 
 const Admin: NextPage = () => {
   const dispatch: any = useDispatch();
   const router = useRouter();
+  const [shouldUpdateFlights, setShouldUpdateFlights] =
+    React.useState<boolean>(false);
+  const destinations = useSelector(
+    (state: AppState) => state?.adminReducer?.destinations
+  );
+  const airlines = useSelector(
+    (state: AppState) => state?.adminReducer?.airlines
+  );
   const flights = useSelector(
     (state: AppState) => state?.adminReducer?.flights
   );
+
+  React.useEffect(() => {
+    dispatch(getAirlinesAction());
+  }, []);
+
+  React.useEffect(() => {
+    dispatch(getDestinationsAction());
+  }, []);
+
+  React.useEffect(() => {
+    dispatch(getFlightsAction());
+  }, [shouldUpdateFlights]);
+
   const goBack = () => {
     router.push('/', '/');
   };
   const createFlight = () => {
     dispatch(
       createFlightAction(
-        airline,
+        airline || 1,
         timeOfDeparture,
         timeOfArrival,
-        destination,
-        price,
-        seats
+        destination || 1,
+        price || 1,
+        seats || 1,
+        terminal || 1
       )
     );
-    setAirline('');
-    setDestination('');
+    setShouldUpdateFlights((prevState) => !prevState);
+    setAirline(undefined);
+    setDestination(undefined);
     setPrice(undefined);
     setSeats(undefined);
     setTimeOfArrival(
@@ -46,10 +74,11 @@ const Admin: NextPage = () => {
     );
   };
 
-  const [airline, setAirline] = React.useState<string>('');
-  const [destination, setDestination] = React.useState<string>('');
+  const [airline, setAirline] = React.useState<number>();
+  const [destination, setDestination] = React.useState<number>();
   const [price, setPrice] = React.useState<number>();
   const [seats, setSeats] = React.useState<number>();
+  const [terminal, setTerminal] = React.useState<number>();
 
   const [timeOfDeparture, setTimeOfDeparture] = React.useState<string>(
     moment(new Date().toISOString()).format('yyyy-MM-DDThh:mm')
@@ -59,7 +88,7 @@ const Admin: NextPage = () => {
   );
 
   const handleChangeAirline = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAirline(event.target.value);
+    setAirline(parseInt(event.target.value));
   };
   const handleChangePrice = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parseInt(event.target.value));
@@ -67,22 +96,30 @@ const Admin: NextPage = () => {
   const handleChangeSeats = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSeats(parseInt(event.target.value));
   };
+  const handleChangeTerminal = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setTerminal(parseInt(event.target.value));
+  };
   const handleChangeDestination = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setDestination(event.target.value);
+    setDestination(parseInt(event.target.value));
   };
   const onTimeOfDepartureChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setTimeOfDeparture(event.target.value);
   };
-
   const onTimeOfArrivalChangeHandler = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setTimeOfArrival(event.target.value);
   };
+
+  const deleteFlight = (flightId: number) => {
+    dispatch(deleteFlightAction(flightId));
+    setShouldUpdateFlights((prevState) => !prevState);
+  };
+
   return (
     <Wrapper>
       <Column>
@@ -112,8 +149,8 @@ const Admin: NextPage = () => {
               }}
             >
               {airlines.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+                <MenuItem key={option.id} value={option.id}>
+                  {option.naziv}
                 </MenuItem>
               ))}
             </TextField>
@@ -191,8 +228,9 @@ const Admin: NextPage = () => {
               }}
             >
               {destinations.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+                <MenuItem key={option.id} value={option.id}>
+                  {option.imeGrada} ({option.imeAerodroma}, {option.udaljenost}
+                  km)
                 </MenuItem>
               ))}
             </TextField>
@@ -229,7 +267,30 @@ const Admin: NextPage = () => {
               onChange={handleChangeSeats}
               value={seats}
               variant="standard"
-              label="Number of seats"
+              label="Number of seats (Capacity)"
+              sx={{
+                '& > :not(style)': { color: 'white' },
+                '& label.Mui-focused': {
+                  color: 'white',
+                },
+                '& .MuiInput-underline:after': {
+                  borderBottomColor: 'white',
+                },
+                '& .MuiInput-underline:before': {
+                  borderBottomColor: 'rgba(255,255,255,0.8)',
+                },
+              }}
+            />
+          </Section>
+          <Section>
+            <TextField
+              fullWidth
+              required
+              type="number"
+              onChange={handleChangeTerminal}
+              value={terminal}
+              variant="standard"
+              label="Terminal"
               sx={{
                 '& > :not(style)': { color: 'white' },
                 '& label.Mui-focused': {
@@ -251,8 +312,13 @@ const Admin: NextPage = () => {
       <Column>
         <Text.h2>List of flights</Text.h2>
         <div>
-          {flights?.map((flight: FlightType, i: number) => (
-            <Flight flight={flight} key={i * 3} />
+          {flights?.map((flight: FlightResponse) => (
+            <Flight
+              flight={flight}
+              key={flight?.id}
+              deleteFlight={deleteFlight}
+              showDeleteFlight
+            />
           ))}
         </div>
       </Column>

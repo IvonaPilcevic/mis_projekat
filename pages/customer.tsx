@@ -1,37 +1,60 @@
 import { MenuItem, TextField } from '@mui/material';
 import { NextPage } from 'next';
+import Link from 'next/link';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, SmallButton } from '../src/components/Button/Button';
 import Flight from '../src/components/Flight/Flight';
 import { Span } from '../src/components/Flight/FlightStyle';
 import { Text } from '../src/components/Text/Text';
-import { airlines } from '../src/data';
-import { createProfileAction } from '../store/actions/customer.action';
+import {
+  getAirlinesAction,
+  getFlightsAction,
+} from '../store/actions/admin.action';
+import {
+  createProfileAction,
+  makeReservationAction,
+} from '../store/actions/customer.action';
 import { bookFlightAction } from '../store/actions/customerFlight.action';
-import { AppState, Flight as FlightType } from '../store/types';
+import { AppState } from '../store/types';
 import { Column, Section, Wrapper } from '../styles/admin';
 
 const Customer: NextPage = () => {
   const dispatch: any = useDispatch();
-  const flights = useSelector(
-    (state: AppState) => state?.adminReducer?.flights
-  );
   const customer = useSelector(
     (state: AppState) => state?.customerReducer?.customer
   );
-  const [airline, setAirline] = React.useState<string>('');
+
+  const airlines = useSelector(
+    (state: AppState) => state?.adminReducer?.airlines
+  );
+  const flights = useSelector(
+    (state: AppState) => state?.adminReducer?.flights
+  );
+
+  const [airline, setAirline] = React.useState<number>();
   const handleChangeAirline = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAirline(event.target.value);
+    setAirline(parseInt(event.target.value));
   };
   const availableFlights = flights?.filter(
-    (flight) => flight?.airline === airline
+    (flight) => flight?.prevoznik?.id === airline
   );
+
+  React.useEffect(() => {
+    dispatch(getAirlinesAction());
+  }, []);
+
+  React.useEffect(() => {
+    dispatch(getFlightsAction());
+  }, []);
 
   const [firstName, setFirstName] = React.useState<string>('');
   const [lastName, setLastName] = React.useState<string>('');
   const [email, setEmail] = React.useState<string>('');
   const [seats, setSeats] = React.useState<number>();
+  const [JMBG, setJMBG] = React.useState<number | string>();
+  const [showSuccessMessage, setShowSuccessMessage] =
+    React.useState<boolean>(false);
 
   const handleChangeFirstName = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -55,21 +78,23 @@ const Customer: NextPage = () => {
     dispatch(createProfileAction(firstName, lastName, email, seats));
   };
 
-  const bookFlight = (flightId: string) => {
-    dispatch(bookFlightAction(customer?.id, flightId));
+  const bookFlight = (flightId: number) => {
+    dispatch(makeReservationAction(flightId));
+    setShowSuccessMessage(true);
   };
+
   return (
     <Wrapper>
       <Column>
         {typeof customer === 'undefined' ? (
-          <Text.h2>Create profile</Text.h2>
+          <Text.h2>Make a reservation</Text.h2>
         ) : (
           <Text.h2>Profile details</Text.h2>
         )}
         {customer ? (
           <div>
             <Text.bold>
-              Customer ID: <Span>{customer?.id}</Span>
+              Customer ID [JMBG]: <Span>{JMBG}</Span>
             </Text.bold>
             <Text.bold>
               First name: <Span>{customer?.firstName}</Span>
@@ -178,6 +203,30 @@ const Customer: NextPage = () => {
                 }}
               />
             </Section>
+
+            <Section>
+              <TextField
+                fullWidth
+                required
+                label="Personal ID [JMBG]"
+                value={JMBG}
+                onChange={(e) => setJMBG(e.target.value)}
+                variant="standard"
+                type="number"
+                sx={{
+                  '& > :not(style)': { color: 'white' },
+                  '& label.Mui-focused': {
+                    color: 'white',
+                  },
+                  '& .MuiInput-underline:after': {
+                    borderBottomColor: 'white',
+                  },
+                  '& .MuiInput-underline:before': {
+                    borderBottomColor: 'rgba(255,255,255,0.8)',
+                  },
+                }}
+              />
+            </Section>
             <Button onClick={onCreateProfile}>Save</Button>
           </div>
         )}
@@ -210,8 +259,8 @@ const Customer: NextPage = () => {
               }}
             >
               {airlines.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+                <MenuItem key={option.id} value={option.id}>
+                  {option.naziv}
                 </MenuItem>
               ))}
             </TextField>
@@ -221,11 +270,15 @@ const Customer: NextPage = () => {
             <Column>
               <Text.h2>List of flights</Text.h2>
               <div>
-                {availableFlights?.map((flight: FlightType, i: number) => (
+                {availableFlights?.map((flight) => (
                   <>
-                    <Flight flight={flight} key={i * 3} />
+                    <Flight
+                      flight={flight}
+                      key={flight?.id}
+                      showDeleteFlight={false}
+                    />
                     <SmallButton onClick={() => bookFlight(flight?.id)}>
-                      Select flight
+                      Make reservation
                     </SmallButton>
                   </>
                 ))}
@@ -237,6 +290,27 @@ const Customer: NextPage = () => {
             </Text.bold>
           )}
         </div>
+
+        {showSuccessMessage && (
+          <div
+            style={{
+              margin: '30px auto',
+              backgroundColor: 'rgba(0,0,0,0.1)',
+              textAlign: 'center',
+              padding: '20px',
+              borderRadius: '5px',
+              border: '1px solid white',
+              maxWidth: '300px',
+            }}
+          >
+            <Text.bold>
+              Your reservation was successful, return to{' '}
+              <Link href="/">
+                <a>HOME</a>
+              </Link>
+            </Text.bold>
+          </div>
+        )}
       </Column>
     </Wrapper>
   );
